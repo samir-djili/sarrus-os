@@ -1,0 +1,46 @@
+# Build output
+build/
+*.o
+*.bin
+*.elf
+*.iso
+*.img
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Backup files
+*.bak
+*.backup
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+*.rar
+
+# Dependencies
+*.d
+
+# Generated files
+tags
+TAGS
+.tags
+.TAGS
+
+# Debug files
+*.gdb_history
