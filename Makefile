@@ -22,12 +22,16 @@ LDFLAGS = -T linker.ld -nostdlib
 BOOT_ASM = $(BOOT_DIR)/boot.asm
 KERNEL_C = $(wildcard $(KERNEL_DIR)/*.c)
 KERNEL_ASM = $(wildcard $(KERNEL_DIR)/*.asm)
+MM_C = $(wildcard $(SRC_DIR)/mm/*.c)
+ARCH_ASM = $(SRC_DIR)/arch/x86/paging.asm
 
 # Object files
 BOOT_OBJ = $(BUILD_DIR)/boot.o
 KERNEL_C_OBJ = $(KERNEL_C:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 KERNEL_ASM_OBJ = $(KERNEL_ASM:$(SRC_DIR)/%.asm=$(BUILD_DIR)/%.o)
-KERNEL_OBJ = $(KERNEL_C_OBJ) $(KERNEL_ASM_OBJ)
+MM_C_OBJ = $(MM_C:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+ARCH_ASM_OBJ = $(BUILD_DIR)/arch/x86/paging.o
+KERNEL_OBJ = $(KERNEL_C_OBJ) $(KERNEL_ASM_OBJ) $(MM_C_OBJ) $(ARCH_ASM_OBJ)
 
 # Output
 KERNEL_ELF = $(BUILD_DIR)/kernel.elf
@@ -43,6 +47,8 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/kernel
 	mkdir -p $(BUILD_DIR)/boot
+	mkdir -p $(BUILD_DIR)/mm
+	mkdir -p $(BUILD_DIR)/arch/x86
 	mkdir -p $(ISO_DIR)
 	mkdir -p $(ISO_DIR)/boot
 	mkdir -p $(ISO_DIR)/boot/grub
@@ -57,6 +63,10 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 
 # Kernel ASM objects
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.asm | $(BUILD_DIR)
+	$(AS) $(ASFLAGS) $< -o $@
+
+# Architecture-specific ASM objects
+$(BUILD_DIR)/arch/x86/%.o: $(SRC_DIR)/arch/x86/%.asm | $(BUILD_DIR)
 	$(AS) $(ASFLAGS) $< -o $@
 
 # Kernel ELF

@@ -1,31 +1,13 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "kernel.h"
+#include "memory.h"
 
-/* Hardware text mode color constants. */
-enum vga_color {
-    VGA_COLOR_BLACK = 0,
-    VGA_COLOR_BLUE = 1,
-    VGA_COLOR_GREEN = 2,
-    VGA_COLOR_CYAN = 3,
-    VGA_COLOR_RED = 4,
-    VGA_COLOR_MAGENTA = 5,
-    VGA_COLOR_BROWN = 6,
-    VGA_COLOR_LIGHT_GREY = 7,
-    VGA_COLOR_DARK_GREY = 8,
-    VGA_COLOR_LIGHT_BLUE = 9,
-    VGA_COLOR_LIGHT_GREEN = 10,
-    VGA_COLOR_LIGHT_CYAN = 11,
-    VGA_COLOR_LIGHT_RED = 12,
-    VGA_COLOR_LIGHT_MAGENTA = 13,
-    VGA_COLOR_LIGHT_BROWN = 14,
-    VGA_COLOR_WHITE = 15,
-};
-
-static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
+uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
     return fg | bg << 4;
 }
 
-static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
+uint16_t vga_entry(unsigned char uc, uint8_t color) {
     return (uint16_t) uc | (uint16_t) color << 8;
 }
 
@@ -96,22 +78,49 @@ void kernel_main(void) {
     terminal_initialize();
 
     /* Print welcome message */
-    terminal_writestring("Welcome to Sarrus OS!\n");
-    terminal_writestring("Kernel loaded successfully.\n");
-    terminal_writestring("System initialized.\n\n");
-    
     terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
-    terminal_writestring("Sarrus OS v0.1.0\n");
+    terminal_writestring("Welcome to Sarrus OS!\n");
+    terminal_writestring("====================\n\n");
     
+    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+    terminal_writestring("Version: 0.1.0 (Development)\n");
+    terminal_writestring("Architecture: x86 (32-bit)\n");
+    terminal_writestring("Build: DEBUG\n\n");
+    
+    /* Initialize memory management system */
     terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    terminal_writestring("Built on: ");
-    terminal_writestring(__DATE__);
-    terminal_writestring(" ");
-    terminal_writestring(__TIME__);
-    terminal_writestring("\n\n");
+    terminal_writestring("Initializing Memory Management...\n");
+    memory_init();
     
-    terminal_setcolor(vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK));
-    terminal_writestring("Kernel is running...\n");
+    /* Test the memory system */
+    terminal_setcolor(vga_entry_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK));
+    memory_test();
+    
+    /* Print memory statistics */
+    terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
+    memory_print_stats();
+    
+    /* System ready message */
+    terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
+    terminal_writestring("\nSystem initialized successfully!\n");
+    terminal_writestring("Sarrus OS is running with basic memory management.\n");
+    
+    terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+    terminal_writestring("\nCurrent features:\n");
+    terminal_writestring("- VGA text mode display\n");
+    terminal_writestring("- Basic heap allocation (kmalloc/kfree)\n");
+    terminal_writestring("- Memory corruption detection\n");
+    terminal_writestring("- Memory usage statistics\n\n");
+    
+    terminal_writestring("Next steps:\n");
+    terminal_writestring("- Enable paging and virtual memory\n");
+    terminal_writestring("- Interrupt handling (IDT)\n");
+    terminal_writestring("- Process management\n");
+    terminal_writestring("- File system\n");
+    terminal_writestring("- DOOM compatibility layer\n\n");
+    
+    terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
+    terminal_writestring("System running. Memory management operational.\n");
     
     /* Kernel main loop - for now, just halt */
     while (1) {
